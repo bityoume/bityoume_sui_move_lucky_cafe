@@ -59,7 +59,7 @@ export PACKAGE_ID=0xc0c00b50dd913b4137bfa078701b04a69f47eb87ac1b6cb6115f40426096
 - **run command**
 
 ```bash
-# 获取drand随机源当前轮次
+# Obtain the current round of drand random source
 export BASE_ROUND=`curl -s https://drand.cloudflare.com/52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971/public/latest | jq .round`
 echo $BASE_ROUND
 
@@ -93,15 +93,14 @@ export ADMIN=0xc1c6278827259295249bf3d43ce0861c21960693a89b5677b175d9844eafc57c
 # switch to Alice account
 sui client switch --address alice
 
-# 找alice名下2个大GAS对象，一个用于支付gas，一个用于拆分出指定GAS数量的coin对象
+# Find two large GAS objects under Alice, one for paying gas and the other for splitting out the specified number of COIN object for GAS
 sui client gas --json | jq '.[] | select(.gasBalance > 100000) | .gasCoinId' -r > output.txt
 GAS=$(sed -n '1p' output.txt)
 SPLIT_COIN=$(sed -n '2p' output.txt)
 
-# 拆分出10 GAS，用于购买咖啡卡
+# Split out 10 GAS for purchasing coffee card
 export COIN=`sui client split-coin --coin-id $SPLIT_COIN --amounts 10 --gas $GAS --gas-budget $GAS_BUDGET --json | jq -r '.objectChanges[] | select(.objectType=="0x2::coin::Coin<0x2::sui::SUI>" and .type=="created") | .objectId'`
 
-# 使用10GAS 购买咖啡卡
 sui client call --function buy_cafe_card --package $PACKAGE_ID --module lucky_cafe --args $CAFE $COIN --gas-budget $GAS_BUDGET 
 ```
 
@@ -121,7 +120,7 @@ sui client call --function buy_cafe_card --package $PACKAGE_ID --module lucky_ca
 # switch to Bob account
 sui client switch --address bob
 
-# Find two large GAS objects under Bob's name, one for paying gas and the other for splitting out the specified number of COIN object for GAS
+# Find two large GAS objects under Bob, one for paying gas and the other for splitting out the specified number of COIN object for GAS
 sui client gas --json | jq '.[] | select(.gasBalance > 100000) | .gasCoinId' -r > output.txt
 GAS=$(sed -n '1p' output.txt)
 SPLIT_COIN=$(sed -n '2p' output.txt)
